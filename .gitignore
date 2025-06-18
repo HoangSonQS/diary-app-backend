@@ -1,0 +1,30 @@
+# Compiled output
+/build/
+
+# Gradle
+.gradle/
+!gradle-wrapper.jar
+
+# Log files
+*.log
+*.log.*
+
+# IDE configuration files
+.idea/
+*.iml
+*.iws
+.project
+.classpath
+.factorypath
+.settings/
+.sts4-cache/
+
+# VS Code
+.vscode/
+
+# Environment files - Không bao giờ đưa các file chứa mật khẩu lên Git
+.env
+
+# OS-generated files
+.DS_Store
+Thumbs.db
