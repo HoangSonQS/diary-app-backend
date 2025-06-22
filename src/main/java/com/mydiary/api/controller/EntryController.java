@@ -50,4 +50,11 @@ public class EntryController {
         entryService.deleteEntry(entryId, username);
         return ResponseEntity.ok("Entry deleted successfully!");
     }
+
+    @GetMapping("/tag/{tagName}")
+    public ResponseEntity<List<EntryDto>> getEntriesByTag(@PathVariable String tagName, Authentication authentication) {
+        String username = authentication.getName();
+        List<EntryDto> entries = entryService.getEntriesByTag(tagName, username);
+        return ResponseEntity.ok(entries);
+    }
 }

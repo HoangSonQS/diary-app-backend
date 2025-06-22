@@ -84,12 +84,28 @@ public class EntryServiceImpl implements EntryService {
     public EntryDto updateEntry(Long entryId, EntryDto entryDto, String username) {
         User user = findUserByUsername(username);
         Entry entry = findEntryById(entryId);
+
         if(!entry.getUser().getId().equals(user.getId())) {
             throw new org.springframework.security.access.AccessDeniedException("Access denied");
         }
 
         //Cap nhat nd
         entry.setContent(entryDto.getContent());
+
+        entry.getTags().clear();
+        if(entryDto.getTags() != null && !entryDto.getTags().isEmpty()) {
+            Set<Tag> managedTags = new HashSet<>();
+            for (String tagName : entryDto.getTags()) {
+                Tag tag = tagRepository.findByName(tagName.trim().toLowerCase())
+                        .orElseGet(() -> {
+                            Tag newTag = new Tag();
+                            newTag.setName(tagName.trim().toLowerCase());
+                            return tagRepository.save(newTag);
+                        });
+                managedTags.add(tag);
+            }
+            entry.setTags(managedTags);
+        }
 
         Entry updatedEntry = entryRepository.save(entry);
 
@@ -107,6 +123,19 @@ public class EntryServiceImpl implements EntryService {
         entryRepository.delete(entry);
     }
 
+    @Override
+    public List<EntryDto> getEntriesByTag(String tagName, String username) {
+        User user = findUserByUsername(username);
+
+        List<Entry> entries = entryRepository.findAllByUserOrderByEntryDateDesc(user)
+                .stream()
+                .filter(entry -> entry.getTags().stream()
+                        .anyMatch(tag -> tag.getName().equalsIgnoreCase(tagName.trim().toLowerCase())))
+                .collect(Collectors.toList());
+
+        return entries.stream().map(this::mapToDto).collect(Collectors.toList());
+    }
+
     private User findUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
@@ -115,4 +144,5 @@ public class EntryServiceImpl implements EntryService {
         return entryRepository.findById(entryId)
                 .orElseThrow(() -> new UsernameNotFoundException("Entry not found: " + entryId));
     }
+
 }
