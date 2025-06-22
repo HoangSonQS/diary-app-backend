@@ -1,11 +1,14 @@
 package com.mydiary.api.service;
 
 import com.mydiary.api.dto.EntryDto;
+import com.mydiary.api.dto.MoodDto;
 import com.mydiary.api.entity.Entry;
+import com.mydiary.api.entity.Mood;
 import com.mydiary.api.entity.Tag;
 import com.mydiary.api.entity.User;
 import com.mydiary.api.exception.ResourceNotFoundException;
 import com.mydiary.api.repository.EntryRepository;
+import com.mydiary.api.repository.MoodRepository;
 import com.mydiary.api.repository.TagRepository;
 import com.mydiary.api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +31,13 @@ public class EntryServiceImpl implements EntryService {
     private UserRepository userRepository;
     @Autowired
     private TagRepository tagRepository;
+    @Autowired
+    private MoodRepository moodRepository;
 
     @Override
     @Transactional // Đảm bảo tất cả các thao tác CSDL trong hàm này là một giao dịch
     public EntryDto createEntry(EntryDto entryDto, String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        User user = findUserByUsername(username);
 
         Entry entry = new Entry();
         entry.setContent(entryDto.getContent());
@@ -54,6 +58,13 @@ public class EntryServiceImpl implements EntryService {
                 managedTags.add(tag);
             }
             entry.setTags(managedTags);
+        }
+
+        // Xử lý mood
+        if (entryDto.getMoodId() != null) {
+            Mood mood = moodRepository.findById(entryDto.getMoodId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Mood not found with id: " + entryDto.getMoodId()));
+            entry.setMood(mood);
         }
 
         Entry savedEntry = entryRepository.save(entry);
@@ -78,6 +89,15 @@ public class EntryServiceImpl implements EntryService {
         if (entry.getTags() != null) {
             entryDto.setTags(entry.getTags().stream().map(Tag::getName).collect(Collectors.toSet()));
         }
+
+        if (entry.getMood() != null) {
+            MoodDto moodDto = new MoodDto();
+            moodDto.setId(entry.getMood().getId());
+            moodDto.setName(entry.getMood().getName());
+            moodDto.setIconName(entry.getMood().getIconName());
+            entryDto.setMood(moodDto);
+        }
+
         return entryDto;
     }
 
@@ -100,6 +120,14 @@ public class EntryServiceImpl implements EntryService {
                 managedTags.add(tag);
             }
             entry.setTags(managedTags);
+        }
+
+        if (entryDto.getMoodId() != null) {
+            Mood mood = moodRepository.findById(entryDto.getMoodId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Mood not found with id: " + entryDto.getMoodId()));
+            entry.setMood(mood);
+        } else {
+            entry.setMood(null); // Cho phép bỏ mood nếu không gửi moodId
         }
 
         Entry updatedEntry = entryRepository.save(entry);
