@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+
 public interface EntryRepository extends JpaRepository<Entry, Long> {
     // Tìm tất cả các bài viết của một user, sắp xếp theo ngày giảm dần
     List<Entry> findAllByUserOrderByEntryDateDesc(User user);
