@@ -1,4 +1,4 @@
-git package com.mydiary.api.repository;
+package com.mydiary.api.repository;
 
 import com.mydiary.api.entity.Mood;
 import org.springframework.data.jpa.repository.JpaRepository;
