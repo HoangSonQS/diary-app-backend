@@ -9,4 +9,5 @@ public interface EntryService {
     // Chúng ta sẽ thêm các phương thức khác sau
     EntryDto updateEntry(Long entryId, EntryDto entryDto, String username);
     void deleteEntry(Long entryId, String username);
+    List<EntryDto> getEntriesByTag(String tagName, String username);
 }
