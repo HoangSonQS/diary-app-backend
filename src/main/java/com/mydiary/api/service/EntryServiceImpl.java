@@ -4,6 +4,7 @@ import com.mydiary.api.dto.EntryDto;
 import com.mydiary.api.entity.Entry;
 import com.mydiary.api.entity.Tag;
 import com.mydiary.api.entity.User;
+import com.mydiary.api.exception.ResourceNotFoundException;
 import com.mydiary.api.repository.EntryRepository;
 import com.mydiary.api.repository.TagRepository;
 import com.mydiary.api.repository.UserRepository;
@@ -82,13 +83,7 @@ public class EntryServiceImpl implements EntryService {
 
     @Override
     public EntryDto updateEntry(Long entryId, EntryDto entryDto, String username) {
-        User user = findUserByUsername(username);
-        Entry entry = findEntryById(entryId);
-
-        if(!entry.getUser().getId().equals(user.getId())) {
-            throw new org.springframework.security.access.AccessDeniedException("Access denied");
-        }
-
+        Entry entry = findAndVerifyEntryOwnership(entryId, username);
         //Cap nhat nd
         entry.setContent(entryDto.getContent());
 
@@ -114,11 +109,7 @@ public class EntryServiceImpl implements EntryService {
 
     @Override
     public void deleteEntry(Long entryId, String username) {
-        User user = findUserByUsername(username);
-        Entry entry = findEntryById(entryId);
-        if(!entry.getUser().getId().equals(user.getId())) {
-            throw new org.springframework.security.access.AccessDeniedException("Access denied");
-        }
+        Entry entry = findAndVerifyEntryOwnership(entryId, username);
 
         entryRepository.delete(entry);
     }
@@ -143,6 +134,18 @@ public class EntryServiceImpl implements EntryService {
     private Entry findEntryById(Long entryId) {
         return entryRepository.findById(entryId)
                 .orElseThrow(() -> new UsernameNotFoundException("Entry not found: " + entryId));
+    }
+    private Entry findAndVerifyEntryOwnership(Long entryId, String username) {
+        User user = findUserByUsername(username);
+
+        Entry entry = entryRepository.findById(entryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Entry not found with id: " + entryId));
+
+        if (!entry.getUser().getId().equals(user.getId())) {
+            throw new org.springframework.security.access.AccessDeniedException("You do not have permission to access this entry");
+        }
+
+        return entry;
     }
 
 }

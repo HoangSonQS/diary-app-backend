@@ -32,6 +32,10 @@ public class Entry {
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mood_id") // Sẽ tạo một cột khóa ngoại tên là 'mood_id' trong bảng 'entries'
+    private Mood mood;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
