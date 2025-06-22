@@ -7,4 +7,6 @@ public interface EntryService {
     EntryDto createEntry(EntryDto entryDto, String username);
     List<EntryDto> getEntriesForUser(String username);
     // Chúng ta sẽ thêm các phương thức khác sau
+    EntryDto updateEntry(Long entryId, EntryDto entryDto, String username);
+    void deleteEntry(Long entryId, String username);
 }

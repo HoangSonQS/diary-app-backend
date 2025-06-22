@@ -79,4 +79,40 @@ public class EntryServiceImpl implements EntryService {
         }
         return entryDto;
     }
+
+    @Override
+    public EntryDto updateEntry(Long entryId, EntryDto entryDto, String username) {
+        User user = findUserByUsername(username);
+        Entry entry = findEntryById(entryId);
+        if(!entry.getUser().getId().equals(user.getId())) {
+            throw new org.springframework.security.access.AccessDeniedException("Access denied");
+        }
+
+        //Cap nhat nd
+        entry.setContent(entryDto.getContent());
+
+        Entry updatedEntry = entryRepository.save(entry);
+
+        return mapToDto(updatedEntry);
+    }
+
+    @Override
+    public void deleteEntry(Long entryId, String username) {
+        User user = findUserByUsername(username);
+        Entry entry = findEntryById(entryId);
+        if(!entry.getUser().getId().equals(user.getId())) {
+            throw new org.springframework.security.access.AccessDeniedException("Access denied");
+        }
+
+        entryRepository.delete(entry);
+    }
+
+    private User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    }
+    private Entry findEntryById(Long entryId) {
+        return entryRepository.findById(entryId)
+                .orElseThrow(() -> new UsernameNotFoundException("Entry not found: " + entryId));
+    }
 }
