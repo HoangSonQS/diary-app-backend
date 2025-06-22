@@ -34,4 +34,20 @@ public class EntryController {
         List<EntryDto> entries = entryService.getEntriesForUser(username);
         return ResponseEntity.ok(entries);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<EntryDto> updateEntry(@PathVariable(name = "id") Long entryId,
+                                                @Valid @RequestBody EntryDto entryDto,
+                                                Authentication authentication) {
+        String username = authentication.getName();
+        EntryDto updatedEntry = entryService.updateEntry(entryId, entryDto, username);
+        return ResponseEntity.ok(updatedEntry);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteEntry(@PathVariable(name = "id") Long entryId,
+                                                Authentication authentication) {
+        String username = authentication.getName();
+        entryService.deleteEntry(entryId, username);
+        return ResponseEntity.ok("Entry deleted successfully!");
+    }
 }
