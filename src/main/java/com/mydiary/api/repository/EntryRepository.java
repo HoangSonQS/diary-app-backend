@@ -15,4 +15,7 @@ public interface EntryRepository extends JpaRepository<Entry, Long> {
 
     // Tìm bài viết của một user vào một ngày cụ thể
     Optional<Entry> findByUserAndEntryDate(User user, LocalDate date);
+
+    // Tìm tất cả các bài viết của một user có chứa một từ khóa trong nội dung (không phân biệt hoa thường)
+    List<Entry> findByUserAndContentContainingIgnoreCaseOrderByEntryDateDesc(User user, String keyword);
 }

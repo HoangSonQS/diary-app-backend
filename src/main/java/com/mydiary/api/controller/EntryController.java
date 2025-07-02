@@ -57,4 +57,12 @@ public class EntryController {
         List<EntryDto> entries = entryService.getEntriesByTag(tagName, username);
         return ResponseEntity.ok(entries);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<EntryDto>> searchEntries(@RequestParam("keyword") String keyword,
+                                                        Authentication authentication) {
+        String username = authentication.getName();
+        List<EntryDto> entries = entryService.searchEntries(username, keyword);
+        return ResponseEntity.ok(entries);
+    }
 }

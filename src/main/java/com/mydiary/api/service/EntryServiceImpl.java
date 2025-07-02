@@ -155,6 +155,17 @@ public class EntryServiceImpl implements EntryService {
         return entries.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
+    @Override
+    public List<EntryDto> searchEntries(String username, String keyword) {
+        User user = findUserByUsername(username); // Dùng lại hàm helper
+
+        List<Entry> entries = entryRepository.findByUserAndContentContainingIgnoreCaseOrderByEntryDateDesc(user, keyword);
+
+        return entries.stream()
+                .map(this::mapToDto) // Dùng lại hàm helper mapToDto
+                .collect(Collectors.toList());
+    }
+
     private User findUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));

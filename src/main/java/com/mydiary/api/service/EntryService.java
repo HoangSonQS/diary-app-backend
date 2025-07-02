@@ -10,4 +10,7 @@ public interface EntryService {
     EntryDto updateEntry(Long entryId, EntryDto entryDto, String username);
     void deleteEntry(Long entryId, String username);
     List<EntryDto> getEntriesByTag(String tagName, String username);
+
+    // Thêm vào file EntryService.java
+    List<EntryDto> searchEntries(String username, String keyword);
 }
