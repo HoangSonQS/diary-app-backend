@@ -159,10 +159,7 @@ public class EntryServiceImpl implements EntryService {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
-    private Entry findEntryById(Long entryId) {
-        return entryRepository.findById(entryId)
-                .orElseThrow(() -> new UsernameNotFoundException("Entry not found: " + entryId));
-    }
+
     private Entry findAndVerifyEntryOwnership(Long entryId, String username) {
         User user = findUserByUsername(username);
 

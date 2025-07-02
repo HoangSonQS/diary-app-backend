@@ -27,6 +27,12 @@ public class User {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
