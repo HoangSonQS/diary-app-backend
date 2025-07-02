@@ -184,4 +184,19 @@ public class EntryServiceImpl implements EntryService {
         return entry;
     }
 
+    @Override
+    public List<EntryDto> getOnThisDayEntries(String username) {
+        User user = findUserByUsername(username); // Dùng lại hàm helper
+        LocalDate today = LocalDate.now();
+
+        int month = today.getMonthValue();
+        int day = today.getDayOfMonth();
+
+        List<Entry> entries = entryRepository.findOnThisDay(user, month, day);
+
+        return entries.stream()
+                .map(this::mapToDto) // Dùng lại hàm helper mapToDto
+                .collect(Collectors.toList());
+    }
+
 }
