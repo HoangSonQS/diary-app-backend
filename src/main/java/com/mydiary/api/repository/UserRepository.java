@@ -16,4 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // Kiểm tra xem email đã tồn tại chưa
     Boolean existsByEmail(String email);
+
+    Optional<User> findByEmail(String email);
+    Optional<User> findByResetPasswordToken(String token);
 }

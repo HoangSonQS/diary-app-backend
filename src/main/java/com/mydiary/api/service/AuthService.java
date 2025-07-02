@@ -6,4 +6,6 @@ import com.mydiary.api.dto.RegisterDto;
 public interface AuthService {
     String register(RegisterDto registerDto);
     String login(LoginDto loginDto);
+    void forgotPassword(String email);
+    void resetPassword(String token, String newPassword);
 }

@@ -33,8 +33,15 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String bio;
 
+    @Column(name = "reset_password_token")
+    private String resetPasswordToken;
+
+    @Column(name = "reset_password_token_expiry")
+    private LocalDateTime resetPasswordTokenExpiry;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
 }
