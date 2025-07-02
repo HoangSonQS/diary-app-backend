@@ -1,9 +1,7 @@
 // File: src/main/java/com/mydiary/api/controller/AuthController.java
 package com.mydiary.api.controller;
 
-import com.mydiary.api.dto.JwtAuthResponseDto;
-import com.mydiary.api.dto.LoginDto;
-import com.mydiary.api.dto.RegisterDto;
+import com.mydiary.api.dto.*;
 import com.mydiary.api.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +33,17 @@ public class AuthController {
     public ResponseEntity<String> register(@Valid @RequestBody RegisterDto registerDto) {
         String response = authService.register(registerDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordDto forgotPasswordDto) {
+        authService.forgotPassword(forgotPasswordDto.getEmail());
+        return ResponseEntity.ok("A password reset link has been sent to your email.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordDto resetPasswordDto) {
+        authService.resetPassword(resetPasswordDto.getToken(), resetPasswordDto.getNewPassword());
+        return ResponseEntity.ok("Password has been reset successfully.");
     }
 }
