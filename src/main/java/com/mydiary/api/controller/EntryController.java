@@ -65,4 +65,11 @@ public class EntryController {
         List<EntryDto> entries = entryService.searchEntries(username, keyword);
         return ResponseEntity.ok(entries);
     }
+
+    @GetMapping("/on-this-day")
+    public ResponseEntity<List<EntryDto>> getOnThisDayEntries(Authentication authentication) {
+        String username = authentication.getName();
+        List<EntryDto> entries = entryService.getOnThisDayEntries(username);
+        return ResponseEntity.ok(entries);
+    }
 }

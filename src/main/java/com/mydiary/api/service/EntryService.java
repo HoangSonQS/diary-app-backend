@@ -13,4 +13,6 @@ public interface EntryService {
 
     // Thêm vào file EntryService.java
     List<EntryDto> searchEntries(String username, String keyword);
+
+    List<EntryDto> getOnThisDayEntries(String username);
 }
