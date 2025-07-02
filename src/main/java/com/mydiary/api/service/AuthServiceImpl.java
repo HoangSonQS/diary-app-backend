@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -66,30 +67,29 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void forgotPassword(String email) {
         // Tìm user bằng email
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+        Optional<User> userOptional = userRepository.findByEmail(email);
 
-        // Tạo token ngẫu nhiên
-        String token = UUID.randomUUID().toString();
+        // DÙ TÌM THẤY HAY KHÔNG, KHÔNG NÉM LỖI Ở ĐÂY
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
 
-        // Đặt thời gian hết hạn (ví dụ: 15 phút sau)
-        LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(15);
+            // Chỉ thực hiện logic bên trong nếu user tồn tại
+            String token = UUID.randomUUID().toString();
+            LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(15);
 
-        user.setResetPasswordToken(token);
-        user.setResetPasswordTokenExpiry(expiryDate);
-        userRepository.save(user);
+            user.setResetPasswordToken(token);
+            user.setResetPasswordTokenExpiry(expiryDate);
+            userRepository.save(user);
 
-        // Tạo đường link reset (Trong thực tế, URL này nên trỏ đến trang front-end của bạn)
-        String resetLink = "http://localhost:3000/reset-password?token=" + token;
+            String resetLink = "http://localhost:3000/reset-password?token=" + token;
+            String emailBody = "Chào bạn,\n\n"
+                    + "Bạn đã yêu cầu reset mật khẩu. Vui lòng nhấn vào đường link dưới đây để đặt lại mật khẩu của bạn:\n"
+                    + resetLink + "\n\n"
+                    + "Đường link sẽ hết hạn trong 15 phút.\n\n"
+                    + "Nếu bạn không yêu cầu điều này, xin hãy bỏ qua email này.";
 
-        String emailBody = "Chào bạn,\n\n"
-                + "Bạn đã yêu cầu reset mật khẩu. Vui lòng nhấn vào đường link dưới đây để đặt lại mật khẩu của bạn:\n"
-                + resetLink + "\n\n"
-                + "Đường link sẽ hết hạn trong 15 phút.\n\n"
-                + "Nếu bạn không yêu cầu điều này, xin hãy bỏ qua email này.\n\n"
-                + "Trân trọng,\nĐội ngũ ứng dụng Nhật ký.";
-
-        emailService.sendEmail(user.getEmail(), "Yêu cầu Reset Mật khẩu", emailBody);
+            emailService.sendEmail(user.getEmail(), "Yêu cầu Reset Mật khẩu", emailBody);
+        }
     }
 
     @Override
