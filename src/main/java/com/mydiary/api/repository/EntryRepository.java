@@ -23,4 +23,6 @@ public interface EntryRepository extends JpaRepository<Entry, Long> {
 
     @Query("SELECT e FROM Entry e WHERE e.user = :user AND EXTRACT(MONTH FROM e.entryDate) = :month AND EXTRACT(DAY FROM e.entryDate) = :day ORDER BY e.entryDate DESC")
     List<Entry> findOnThisDay(@Param("user") User user, @Param("month") int month, @Param("day") int day);
+
+    long countByUser(User user);
 }

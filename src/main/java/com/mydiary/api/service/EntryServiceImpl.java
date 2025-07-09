@@ -33,6 +33,8 @@ public class EntryServiceImpl implements EntryService {
     private TagRepository tagRepository;
     @Autowired
     private MoodRepository moodRepository;
+    @Autowired
+    private AchievementService achievementService;
 
     @Override
     @Transactional // Đảm bảo tất cả các thao tác CSDL trong hàm này là một giao dịch
@@ -68,6 +70,9 @@ public class EntryServiceImpl implements EntryService {
         }
 
         Entry savedEntry = entryRepository.save(entry);
+
+        achievementService.checkAndGrantAchievements(user);
+
         return mapToDto(savedEntry);
     }
 
