@@ -32,6 +32,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String register(RegisterDto registerDto) {
+
+        String usernameToSave = registerDto.getUsername();
+        if (usernameToSave == null || usernameToSave.trim().isEmpty()) {
+            usernameToSave = registerDto.getEmail();
+        }
         if (userRepository.existsByUsername(registerDto.getUsername())) {
             throw new RuntimeException("Username is already taken!");
         }
@@ -40,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = new User();
-        user.setUsername(registerDto.getUsername());
+        user.setUsername(usernameToSave);
         user.setEmail(registerDto.getEmail());
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
 

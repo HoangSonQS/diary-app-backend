@@ -22,7 +22,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired
     private EmailService emailService; // Dùng lại EmailService đã tạo
 
-    // Annotation này sẽ ra lệnh cho Spring tự động chạy phương thức này
+    // Annotation ra lệnh cho Spring tự động chạy phương thức này
     // theo lịch đã định trong cron expression.
     @Scheduled(cron = "0 0 20 * * *") // Chạy vào lúc 20:00 (8 giờ tối) mỗi ngày
     @Override
