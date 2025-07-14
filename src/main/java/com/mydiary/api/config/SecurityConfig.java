@@ -1,5 +1,6 @@
 package com.mydiary.api.config;
 
+import com.mydiary.api.security.JwtAuthenticationEntryPoint;
 import com.mydiary.api.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +20,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // Tiêm JwtAuthenticationFilter vừa tạo vào
+    @Autowired
+    private JwtAuthenticationEntryPoint authenticationEntryPoint;
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -37,15 +39,21 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                // Cấu hình session management là STATELESS vì chúng ta dùng JWT
+
+                // --- ĐOẠN CODE QUAN TRỌNG NHẤT ---
+                // Cấu hình việc xử lý Exception, chỉ định entry point cho lỗi xác thực
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                )
+                // ------------------------------------
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/auth/**").permitAll() // Cho phép các API xác thực
+                        .anyRequest().authenticated() // Tất cả các request khác phải được xác thực
                 );
 
-        // Thêm filter của chúng ta vào trước filter mặc định của Spring Security
-        // Dòng này nói với Spring: "Hãy chạy JwtAuthenticationFilter của tôi trước khi anh kiểm tra username/password"
+        // Thêm bộ lọc JWT của bạn vào đúng vị trí
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
