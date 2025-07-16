@@ -1,6 +1,7 @@
 package com.mydiary.api.controller;
 
 import com.mydiary.api.dto.ChangePasswordDto;
+import com.mydiary.api.dto.SetPinDto;
 import com.mydiary.api.dto.UserProfileDto;
 import com.mydiary.api.service.UserService;
 import jakarta.validation.Valid;
@@ -38,6 +39,14 @@ public class UserController {
         String username = authentication.getName();
         UserProfileDto updatedProfile = userService.updateUserProfile(username, userProfileDto);
         return ResponseEntity.ok(updatedProfile);
+    }
+
+    @PostMapping("/set-pin")
+    public ResponseEntity<String> setPin(@Valid @RequestBody SetPinDto setPinDto,
+                                         Authentication authentication) {
+        String username = authentication.getName();
+        userService.setPin(username, setPinDto.getPin());
+        return ResponseEntity.ok("PIN has been set successfully.");
     }
 
 }

@@ -46,4 +46,12 @@ public class AuthController {
         authService.resetPassword(resetPasswordDto.getToken(), resetPasswordDto.getNewPassword());
         return ResponseEntity.ok("Password has been reset successfully.");
     }
+
+    @PostMapping("/login-pin")
+    public ResponseEntity<JwtAuthResponseDto> loginWithPin(@Valid @RequestBody PinLoginDto pinLoginDto) {
+        String token = authService.loginWithPin(pinLoginDto);
+        JwtAuthResponseDto jwtAuthResponse = new JwtAuthResponseDto();
+        jwtAuthResponse.setAccessToken(token);
+        return ResponseEntity.ok(jwtAuthResponse);
+    }
 }
