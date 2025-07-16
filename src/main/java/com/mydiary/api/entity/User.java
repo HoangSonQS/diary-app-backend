@@ -39,6 +39,9 @@ public class User {
     @Column(name = "reset_password_token_expiry")
     private LocalDateTime resetPasswordTokenExpiry;
 
+    @Column(name = "pin_hash")
+    private String pinHash;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

@@ -61,4 +61,18 @@ public class UserServiceImpl implements UserService {
         dto.setBio(user.getBio());
         return dto;
     }
+
+    @Override
+    public void setPin(String username, String pin) {
+        // 1. Tìm người dùng trong database
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+        // 2. Băm (hash) mã PIN mới bằng chính PasswordEncoder đã có
+        String hashedPin = passwordEncoder.encode(pin);
+
+        // 3. Cập nhật trường pinHash và lưu lại
+        user.setPinHash(hashedPin);
+        userRepository.save(user);
+    }
 }
