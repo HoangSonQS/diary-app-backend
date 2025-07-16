@@ -148,4 +148,18 @@ public class AuthServiceImpl implements AuthService {
         // 5. Tạo và trả về JWT token
         return jwtTokenProvider.generateToken(authentication);
     }
+    @Override
+    public boolean userHasPin(String username) {
+        // 1. Tìm người dùng bằng username
+        // Nếu không tìm thấy, coi như không có PIN thay vì ném lỗi,
+        // vì đây là một API kiểm tra công khai.
+        User user = userRepository.findByUsername(username).orElse(null);
+
+        if (user == null) {
+            return false;
+        }
+
+        // 2. Kiểm tra xem trường pinHash có giá trị hay không
+        return user.getPinHash() != null && !user.getPinHash().isEmpty();
+    }
 }

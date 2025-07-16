@@ -9,4 +9,6 @@ public interface UserService {
     UserProfileDto getUserProfile(String username);
     UserProfileDto updateUserProfile(String username, UserProfileDto userProfileDto);
     void setPin(String username, String pin);
+
+
 }
