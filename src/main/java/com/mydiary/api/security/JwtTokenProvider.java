@@ -57,8 +57,8 @@ public class JwtTokenProvider {
                     .parse(token);
             return true;
         } catch (Exception ex) {
-            // Bắt các lỗi thường gặp: token không đúng định dạng, hết hạn, không được hỗ trợ, chuỗi trống
-            // Bạn có thể log chi tiết các lỗi này để debug
+            // In ra lỗi chi tiết để chúng ta biết chính xác tại sao nó thất bại
+            System.out.println("JWT validation failed: " + ex.getMessage());
             return false;
         }
     }

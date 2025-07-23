@@ -10,11 +10,11 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy; // Thêm import này
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter; // Thêm import này
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -22,8 +22,9 @@ public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationEntryPoint authenticationEntryPoint;
+
     @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private JwtAuthenticationFilter jwtAuthFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -31,8 +32,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
     @Bean
@@ -40,21 +41,24 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // --- ĐOẠN CODE QUAN TRỌNG NHẤT ---
-                // Cấu hình việc xử lý Exception, chỉ định entry point cho lỗi xác thực
+                // Cấu hình xử lý exception, chỉ định entry point cho lỗi xác thực
+                // Bước này đảm bảo lỗi 401 Unauthorized được trả về một cách nhất quán
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint)
                 )
-                // ------------------------------------
 
+                // Cấu hình session management là STATELESS vì chúng ta dùng JWT
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // Cấu hình quyền truy cập cho các endpoint
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Cho phép các API xác thực
-                        .anyRequest().authenticated() // Tất cả các request khác phải được xác thực
+                        .anyRequest().authenticated()               // Tất cả các request khác phải được xác thực
                 );
 
-        // Thêm bộ lọc JWT của bạn vào đúng vị trí
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        // Thêm bộ lọc JWT của chúng ta vào đúng vị trí trong chuỗi filter:
+        // nó phải được thực thi TRƯỚC bộ lọc xác thực username/password mặc định.
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

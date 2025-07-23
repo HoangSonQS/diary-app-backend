@@ -1,6 +1,7 @@
 package com.mydiary.api.service;
 
 import com.mydiary.api.dto.LoginDto;
+import com.mydiary.api.dto.PinLoginDto;
 import com.mydiary.api.dto.RegisterDto;
 import com.mydiary.api.entity.User;
 import com.mydiary.api.exception.ResourceNotFoundException;
@@ -8,13 +9,16 @@ import com.mydiary.api.repository.UserRepository;
 import com.mydiary.api.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -116,5 +120,46 @@ public class AuthServiceImpl implements AuthService {
         user.setResetPasswordTokenExpiry(null);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public String loginWithPin(PinLoginDto pinLoginDto) {
+        // 1. Tìm người dùng bằng username hoặc email
+        User user = userRepository.findByUsername(pinLoginDto.getUsernameOrEmail())
+                .orElseGet(() -> userRepository.findByEmail(pinLoginDto.getUsernameOrEmail())
+                        .orElseThrow(() -> new ResourceNotFoundException("User not found with identifier: " + pinLoginDto.getUsernameOrEmail())));
+
+        // 2. Kiểm tra xem người dùng đã thiết lập PIN chưa
+        if (user.getPinHash() == null || user.getPinHash().isEmpty()) {
+            throw new IllegalStateException("PIN has not been set for this user.");
+        }
+
+        // 3. So sánh PIN người dùng nhập với PIN đã băm trong database
+        if (!passwordEncoder.matches(pinLoginDto.getPin(), user.getPinHash())) {
+            // Trong thực tế có thể trả về một lỗi chung chung hơn để tăng bảo mật
+            throw new BadCredentialsException("Invalid PIN");
+        }
+
+        // 4. Nếu PIN chính xác, tạo một đối tượng Authentication
+        // Chúng ta cần tạo thủ công vì không qua luồng UserDetailsService
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user.getUsername(), null, Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
+
+        // 5. Tạo và trả về JWT token
+        return jwtTokenProvider.generateToken(authentication);
+    }
+    @Override
+    public boolean userHasPin(String username) {
+        // 1. Tìm người dùng bằng username
+        // Nếu không tìm thấy, coi như không có PIN thay vì ném lỗi,
+        // vì đây là một API kiểm tra công khai.
+        User user = userRepository.findByUsername(username).orElse(null);
+
+        if (user == null) {
+            return false;
+        }
+
+        // 2. Kiểm tra xem trường pinHash có giá trị hay không
+        return user.getPinHash() != null && !user.getPinHash().isEmpty();
     }
 }

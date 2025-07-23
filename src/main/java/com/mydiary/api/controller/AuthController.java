@@ -7,10 +7,10 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -45,5 +45,19 @@ public class AuthController {
     public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordDto resetPasswordDto) {
         authService.resetPassword(resetPasswordDto.getToken(), resetPasswordDto.getNewPassword());
         return ResponseEntity.ok("Password has been reset successfully.");
+    }
+
+    @PostMapping("/login-pin")
+    public ResponseEntity<JwtAuthResponseDto> loginWithPin(@Valid @RequestBody PinLoginDto pinLoginDto) {
+        String token = authService.loginWithPin(pinLoginDto);
+        JwtAuthResponseDto jwtAuthResponse = new JwtAuthResponseDto();
+        jwtAuthResponse.setAccessToken(token);
+        return ResponseEntity.ok(jwtAuthResponse);
+    }
+    @GetMapping("/users/{username}/has-pin")
+    public ResponseEntity<Map<String, Boolean>> hasPin(@PathVariable String username) {
+        boolean hasPin = authService.userHasPin(username);
+        Map<String, Boolean> response = Collections.singletonMap("hasPin", hasPin);
+        return ResponseEntity.ok(response);
     }
 }
