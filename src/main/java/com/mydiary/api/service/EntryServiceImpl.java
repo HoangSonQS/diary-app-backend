@@ -42,6 +42,7 @@ public class EntryServiceImpl implements EntryService {
         User user = findUserByUsername(username);
 
         Entry entry = new Entry();
+        entry.setTitle(entryDto.getTitle());
         entry.setContent(entryDto.getContent());
         entry.setEntryDate(LocalDate.now());
         entry.setUser(user);
@@ -89,6 +90,7 @@ public class EntryServiceImpl implements EntryService {
     private EntryDto mapToDto(Entry entry) {
         EntryDto entryDto = new EntryDto();
         entryDto.setId(entry.getId());
+        entryDto.setTitle(entry.getTitle());
         entryDto.setContent(entry.getContent());
         entryDto.setEntryDate(entry.getEntryDate());
         if (entry.getTags() != null) {
@@ -110,6 +112,7 @@ public class EntryServiceImpl implements EntryService {
     public EntryDto updateEntry(Long entryId, EntryDto entryDto, String username) {
         Entry entry = findAndVerifyEntryOwnership(entryId, username);
         //Cap nhat nd
+        entry.setTitle(entryDto.getTitle());
         entry.setContent(entryDto.getContent());
 
         entry.getTags().clear();

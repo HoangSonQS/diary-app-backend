@@ -11,6 +11,8 @@ import java.util.Set;
 public class EntryDto {
     private Long id;
 
+    private String title;
+
     @NotBlank(message = "Content cannot be blank")
     private String content;
 
