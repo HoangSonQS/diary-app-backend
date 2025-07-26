@@ -45,14 +45,14 @@ public class EntryServiceImpl implements EntryService {
 
         // Logic mới: Kiểm tra xem đã có bài chính trong ngày chưa
         boolean isFirstEntryOfDay = !entryRepository.findByUserAndEntryDate(user, today).stream()
-                .anyMatch(Entry::isPrimary);
+                .anyMatch(Entry::getIsPrimary);
 
         Entry entry = new Entry();
         entry.setTitle(entryDto.getTitle());
         entry.setContent(entryDto.getContent());
         entry.setEntryDate(today);
         entry.setUser(user);
-        entry.setPrimary(isFirstEntryOfDay);
+        entry.setIsPrimary(isFirstEntryOfDay);
 
         // Xử lý tags
         if (entryDto.getTags() != null && !entryDto.getTags().isEmpty()) {
@@ -230,13 +230,13 @@ public class EntryServiceImpl implements EntryService {
                     // Nếu tìm thấy và nó không phải là bài đang được chọn,
                     // đặt nó về trạng thái "bài phụ"
                     if (!oldPrimaryEntry.getId().equals(entryId)) {
-                        oldPrimaryEntry.setPrimary(false);
+                        oldPrimaryEntry.setIsPrimary(false);
                         entryRepository.save(oldPrimaryEntry);
                     }
                 });
 
         // 3. Đặt bài viết được chọn làm bài chính và lưu lại
-        newPrimaryEntry.setPrimary(true);
+        newPrimaryEntry.setIsPrimary(true);
         Entry savedEntry = entryRepository.save(newPrimaryEntry);
 
         return mapToDto(savedEntry);

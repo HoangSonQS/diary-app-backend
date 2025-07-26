@@ -39,8 +39,8 @@ public class Entry {
     @JoinColumn(name = "mood_id") // Sẽ tạo một cột khóa ngoại tên là 'mood_id' trong bảng 'entries'
     private Mood mood;
 
-    @Column(name = "is_primary", nullable = false)
-    private boolean isPrimary = false;
+    @Column(name = "is_primary", nullable = true)
+    private Boolean isPrimary = false;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
