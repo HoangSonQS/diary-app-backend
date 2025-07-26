@@ -25,4 +25,6 @@ public interface EntryRepository extends JpaRepository<Entry, Long> {
     List<Entry> findOnThisDay(@Param("user") User user, @Param("month") int month, @Param("day") int day);
 
     long countByUser(User user);
+
+    Optional<Entry> findByUserAndEntryDateAndIsPrimaryTrue(User user, LocalDate date);
 }

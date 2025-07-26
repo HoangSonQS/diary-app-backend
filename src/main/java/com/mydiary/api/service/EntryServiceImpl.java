@@ -214,4 +214,32 @@ public class EntryServiceImpl implements EntryService {
                 .collect(Collectors.toList());
     }
 
+    // Thêm vào file EntryServiceImpl.java
+
+    @Override
+    @Transactional
+    public EntryDto setPrimaryEntry(Long entryId, String username) {
+        // 1. Tìm và xác thực bài viết người dùng muốn đặt làm bài chính
+        Entry newPrimaryEntry = findAndVerifyEntryOwnership(entryId, username);
+        User user = newPrimaryEntry.getUser();
+        LocalDate entryDate = newPrimaryEntry.getEntryDate();
+
+        // 2. Tìm bài viết chính cũ trong cùng ngày (nếu có)
+        entryRepository.findByUserAndEntryDateAndIsPrimaryTrue(user, entryDate)
+                .ifPresent(oldPrimaryEntry -> {
+                    // Nếu tìm thấy và nó không phải là bài đang được chọn,
+                    // đặt nó về trạng thái "bài phụ"
+                    if (!oldPrimaryEntry.getId().equals(entryId)) {
+                        oldPrimaryEntry.setPrimary(false);
+                        entryRepository.save(oldPrimaryEntry);
+                    }
+                });
+
+        // 3. Đặt bài viết được chọn làm bài chính và lưu lại
+        newPrimaryEntry.setPrimary(true);
+        Entry savedEntry = entryRepository.save(newPrimaryEntry);
+
+        return mapToDto(savedEntry);
+    }
+
 }
