@@ -23,11 +23,11 @@ public class StreakServiceImpl implements StreakService {
         LocalDate today = LocalDate.now();
 
         LocalDate dateToTest = today;
-        if(entryRepository.findByUserAndEntryDate(user, today).isEmpty()) {
+        if (entryRepository.findByUserAndEntryDate(user, today).isEmpty()) {
             dateToTest = today.minusDays(1);
         }
 
-        while (entryRepository.findByUserAndEntryDate(user, dateToTest).isPresent()) {
+        while (!entryRepository.findByUserAndEntryDate(user, dateToTest).isEmpty()) {
             streakCount++;
             dateToTest = dateToTest.minusDays(1);
         }

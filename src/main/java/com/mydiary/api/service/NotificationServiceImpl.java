@@ -35,8 +35,7 @@ public class NotificationServiceImpl implements NotificationService {
         // 2. Lặp qua từng người dùng
         for (User user : allUsers) {
             // 3. Kiểm tra xem người dùng có viết bài hôm nay không
-            boolean hasWrittenToday = entryRepository.findByUserAndEntryDate(user, LocalDate.now()).isPresent();
-
+            boolean hasWrittenToday = !entryRepository.findByUserAndEntryDate(user, LocalDate.now()).isEmpty();
             if (!hasWrittenToday) {
                 // 4. Nếu chưa viết, gửi email nhắc nhở
                 System.out.println("Sending reminder to: " + user.getEmail());

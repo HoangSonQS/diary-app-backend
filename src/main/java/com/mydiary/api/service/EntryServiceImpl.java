@@ -41,11 +41,18 @@ public class EntryServiceImpl implements EntryService {
     public EntryDto createEntry(EntryDto entryDto, String username) {
         User user = findUserByUsername(username);
 
+        LocalDate today = LocalDate.now();
+
+        // Logic mới: Kiểm tra xem đã có bài chính trong ngày chưa
+        boolean isFirstEntryOfDay = !entryRepository.findByUserAndEntryDate(user, today).stream()
+                .anyMatch(Entry::isPrimary);
+
         Entry entry = new Entry();
         entry.setTitle(entryDto.getTitle());
         entry.setContent(entryDto.getContent());
-        entry.setEntryDate(LocalDate.now());
+        entry.setEntryDate(today);
         entry.setUser(user);
+        entry.setPrimary(isFirstEntryOfDay);
 
         // Xử lý tags
         if (entryDto.getTags() != null && !entryDto.getTags().isEmpty()) {
