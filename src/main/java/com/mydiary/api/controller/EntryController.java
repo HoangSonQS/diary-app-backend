@@ -72,4 +72,12 @@ public class EntryController {
         List<EntryDto> entries = entryService.getOnThisDayEntries(username);
         return ResponseEntity.ok(entries);
     }
+
+    @PutMapping("/{id}/set-primary")
+    public ResponseEntity<EntryDto> setPrimaryEntry(@PathVariable(name = "id") Long entryId,
+                                                    Authentication authentication) {
+        String username = authentication.getName();
+        EntryDto updatedEntry = entryService.setPrimaryEntry(entryId, username);
+        return ResponseEntity.ok(updatedEntry);
+    }
 }

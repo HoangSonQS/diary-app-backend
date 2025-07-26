@@ -15,4 +15,6 @@ public interface EntryService {
     List<EntryDto> searchEntries(String username, String keyword);
 
     List<EntryDto> getOnThisDayEntries(String username);
+
+    EntryDto setPrimaryEntry(Long entryId, String username);
 }
