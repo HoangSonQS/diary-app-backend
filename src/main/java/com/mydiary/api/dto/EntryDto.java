@@ -17,11 +17,13 @@ public class EntryDto {
     private String content;
 
     private LocalDate entryDate;
+
     private Set<String> tags;
 
-    // Dùng để NHẬN DỮ LIỆU từ client khi tạo/sửa
     private Long moodId;
 
-    // Dùng để TRẢ DỮ LIỆU về cho client khi xem
     private MoodDto mood;
+
+    private Boolean isPrimary;
+
 }

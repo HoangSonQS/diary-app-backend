@@ -100,6 +100,7 @@ public class EntryServiceImpl implements EntryService {
         entryDto.setTitle(entry.getTitle());
         entryDto.setContent(entry.getContent());
         entryDto.setEntryDate(entry.getEntryDate());
+        entryDto.setIsPrimary(entry.getIsPrimary());
         if (entry.getTags() != null) {
             entryDto.setTags(entry.getTags().stream().map(Tag::getName).collect(Collectors.toSet()));
         }
