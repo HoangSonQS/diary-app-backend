@@ -89,7 +89,7 @@ public class EntryServiceImpl implements EntryService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        List<Entry> entries = entryRepository.findAllByUserOrderByEntryDateDesc(user);
+        List<Entry> entries = entryRepository.findAllByUserOrdered(user);
         return entries.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
@@ -162,7 +162,7 @@ public class EntryServiceImpl implements EntryService {
     public List<EntryDto> getEntriesByTag(String tagName, String username) {
         User user = findUserByUsername(username);
 
-        List<Entry> entries = entryRepository.findAllByUserOrderByEntryDateDesc(user)
+        List<Entry> entries = entryRepository.findAllByUserOrdered(user)
                 .stream()
                 .filter(entry -> entry.getTags().stream()
                         .anyMatch(tag -> tag.getName().equalsIgnoreCase(tagName.trim().toLowerCase())))

@@ -12,8 +12,8 @@ import java.util.Optional;
 
 
 public interface EntryRepository extends JpaRepository<Entry, Long> {
-    // Tìm tất cả các bài viết của một user, sắp xếp theo ngày giảm dần
-    List<Entry> findAllByUserOrderByEntryDateDesc(User user);
+    @Query("SELECT e FROM Entry e WHERE e.user = :user ORDER BY e.entryDate DESC, e.isPrimary DESC")
+    List<Entry> findAllByUserOrdered(@Param("user") User user);
 
     // Tìm bài viết của một user vào một ngày cụ thể
     List<Entry> findByUserAndEntryDate(User user, LocalDate date);
