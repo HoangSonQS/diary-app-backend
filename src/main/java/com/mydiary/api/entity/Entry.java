@@ -1,10 +1,13 @@
 package com.mydiary.api.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -38,6 +41,14 @@ public class Entry {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mood_id") // Sẽ tạo một cột khóa ngoại tên là 'mood_id' trong bảng 'entries'
     private Mood mood;
+
+    @OneToMany(
+            mappedBy = "entry",
+            cascade = CascadeType.ALL, // Xóa các attachment nếu entry bị xóa
+            orphanRemoval = true
+    )
+    @JsonManagedReference // Tránh đệ quy vô hạn khi chuyển thành JSON
+    private List<Attachment> attachments = new ArrayList<>();
 
     @Column(name = "is_primary", nullable = true)
     private Boolean isPrimary = false;

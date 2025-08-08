@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -21,6 +22,8 @@ public class EntryDto {
     private Set<String> tags;
 
     private Long moodId;
+
+    private List<AttachmentDto> attachments;
 
     private MoodDto mood;
 

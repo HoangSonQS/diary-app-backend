@@ -1,6 +1,9 @@
 package com.mydiary.api.service;
 
 import com.mydiary.api.dto.EntryDto;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.List;
 
 public interface EntryService {
@@ -17,4 +20,7 @@ public interface EntryService {
     List<EntryDto> getOnThisDayEntries(String username);
 
     EntryDto setPrimaryEntry(Long entryId, String username);
+
+    void addAttachmentToEntry(Long entryId, MultipartFile file, String caption, String username) throws IOException;
+
 }
