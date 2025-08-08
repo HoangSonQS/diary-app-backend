@@ -1,11 +1,9 @@
 package com.mydiary.api.service;
 
+import com.mydiary.api.dto.AttachmentDto;
 import com.mydiary.api.dto.EntryDto;
 import com.mydiary.api.dto.MoodDto;
-import com.mydiary.api.entity.Entry;
-import com.mydiary.api.entity.Mood;
-import com.mydiary.api.entity.Tag;
-import com.mydiary.api.entity.User;
+import com.mydiary.api.entity.*;
 import com.mydiary.api.exception.ResourceNotFoundException;
 import com.mydiary.api.repository.EntryRepository;
 import com.mydiary.api.repository.MoodRepository;
@@ -15,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +35,8 @@ public class EntryServiceImpl implements EntryService {
     private MoodRepository moodRepository;
     @Autowired
     private AchievementService achievementService;
+    @Autowired
+    private FileStorageService fileStorageService;
 
     @Override
     @Transactional // Đảm bảo tất cả các thao tác CSDL trong hàm này là một giao dịch
@@ -111,6 +113,15 @@ public class EntryServiceImpl implements EntryService {
             moodDto.setName(entry.getMood().getName());
             moodDto.setIconName(entry.getMood().getIconName());
             entryDto.setMood(moodDto);
+        }
+        if (entry.getAttachments() != null) {
+            entryDto.setAttachments(entry.getAttachments().stream().map(attachment -> {
+                AttachmentDto attachmentDto = new AttachmentDto();
+                attachmentDto.setId(attachment.getId());
+                attachmentDto.setFileUrl(attachment.getFileUrl());
+                attachmentDto.setCaption(attachment.getCaption());
+                return attachmentDto;
+            }).collect(Collectors.toList()));
         }
 
         return entryDto;
@@ -241,6 +252,21 @@ public class EntryServiceImpl implements EntryService {
         Entry savedEntry = entryRepository.save(newPrimaryEntry);
 
         return mapToDto(savedEntry);
+    }
+
+    @Override
+    @Transactional
+    public void addAttachmentToEntry(Long entryId, MultipartFile file, String caption, String username) throws IOException {
+        Entry entry = findAndVerifyEntryOwnership(entryId, username);
+        String fileUrl = fileStorageService.storeFile(file);
+
+        Attachment attachment = new Attachment();
+        attachment.setFileUrl(fileUrl);
+        attachment.setCaption(caption);
+        attachment.setEntry(entry);
+
+        entry.getAttachments().add(attachment);
+        entryRepository.save(entry);
     }
 
 }
